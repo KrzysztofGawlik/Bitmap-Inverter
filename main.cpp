@@ -8,7 +8,7 @@ struct FileHeader{
     uint16_t reservedA; // Reserved data A
     uint16_t reservedB; // Reserved data B
     uint32_t dataOffset; // Location of the first pixel
-} FH;
+};
 
 struct BitmapInformationHeader{
     // Size of self
@@ -28,17 +28,37 @@ struct BitmapInformationHeader{
     uint32_t colorTable;
     uint32_t importantColors;
 
-} BIH;
+};
 
 struct Pixel{
     // Reversed order - little indian notation
     uint8_t blue;
     uint8_t green;
     uint8_t red;
-} Px;
+};
 
 int main(void){
 
-    // Application  
+    FILE* bmp = fopen("sources/test.bmp", "rb");
+    FileHeader fh;
+    BitmapInformationHeader bih;
 
+    fread(&fh, 14, 1, bmp);
+    fread(&bih, 40, 1, bmp);
+
+    cout << "-------------------------------------" << endl;
+    // INFO FROM FILE HEADER
+    cout << "SIGNATURE: " << fh.signature << endl;
+    cout << "SIZE: " << fh.size << endl;
+    cout << "RESERVED A: " << fh.reservedA << " & RESERVED B: " << fh.reservedB << endl;
+    cout << "OFFSET: " << fh.dataOffset << endl;
+    cout << "-------------------------------------" << endl;
+
+    //INFO FROM INFORMATION HEADER
+    cout << "BIH size: " << bih.size << endl;
+    cout << "Image width: " << bih.width << endl;
+    cout << "Image height: " << bih.height << endl;
+    cout << "Planes: " << bih.colorPlanes << endl;
+
+    cout << "-------------------------------------" << endl;
 }
