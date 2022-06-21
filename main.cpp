@@ -39,9 +39,40 @@ struct Pixel{
     uint8_t blue;
 };
 
+bool negateImage(const char* src, int headerSize){
+    try{
+        ifstream in;
+        ofstream out;
+        char* header[headerSize];
+        Pixel px;
+
+        in.open(src, ios::in | ios::binary);
+        out.open(src, ios::in | ios::binary);
+
+        // Copy header
+        in.read((char*)(&header),headerSize);
+        out.write((char*)(&header),headerSize);
+
+        while(!in.eof()){
+            in.read((char*) (&px), sizeof(px));
+            px.red = 255 - px.red;
+            px.green = 255 - px.green;
+            px.blue = 255 - px.blue;
+            out.write((char*) (&px), sizeof(px));
+        }
+        in.close();
+        out.close();
+
+    } catch (exception e){
+        return 0;
+    }
+    return 1;
+}
+
 int main(void){
 
     const char* filePath = "sources/test.bmp";
+    const char* negFilePath = "sources/test-neg.bmp";
     FILE* bmp = fopen(filePath, "rb");
     FileHeader fh;
     BitmapInformationHeader bih;
@@ -54,6 +85,7 @@ int main(void){
 
     fread(&bih, 40, 1, bmp); // Read all from INFO_HEADER
 
+    cout << "\nMETADATA FROM FILE" << endl;
     cout << "-------------------------------------" << endl;
     // INFO FROM FILE HEADER
     cout << "SIGNATURE: " << fh.signature << endl;
@@ -76,11 +108,33 @@ int main(void){
             "Important colors: " << bih.important_color_count << endl;
 
     cout << "-------------------------------------" << endl;
-    //cout << "> Converting image to negative..." << endl;
-    
-    // Conversion
 
-
-    //cout << "> Image converted!" << endl;
+    char convert;
+    bool loop = true;
+    cout << "Would you like to convert image to negative (y/n)? ";
+    while(loop){
+        cin >> convert;
+        switch(convert){
+            case 'y':{
+                loop = false;
+                continue;
+            }
+            case 'n':{
+                return 0;
+            }
+            default:{
+                cout << "Incorrect option, try again... (y/n) ";
+            }
+        }
+    }
+    cout << "> Converting image to negative..." << endl;
+    bool succeed = negateImage(filePath, fh.file_offset_to_pixel_array);
+    if(succeed){
+        cout << "> Conversion completed!" << endl;
+    } else {
+        cout << "> Conversion failed!" << endl;
+    }
     cout << "-------------------------------------" << endl;
+    cout << "Press enter to close...";
+    cin.sync(); cin.get();
 }
