@@ -3,7 +3,7 @@
 using namespace std;
 
 struct FileHeader{ // 14 BYTES
-    uint8_t signature; //2B 'BM'
+    char signature[2]; //2B 'BM'
     uint32_t file_size; //4B file size in bytes
     uint32_t reserved; //4B unused=0
     uint32_t file_offset_to_pixel_array; //4B offset from beginning of file to the beggining of the bitmap data
@@ -41,25 +41,31 @@ struct Pixel{
 
 int main(void){
 
-    FILE* bmp = fopen("sources/test.bmp", "rb");
+    const char* filePath = "sources/test.bmp";
+    FILE* bmp = fopen(filePath, "rb");
     FileHeader fh;
     BitmapInformationHeader bih;
 
-    fread(&fh, 14, 1, bmp); // Read all from HEADER
+    //fread(&fh, 14, 1, bmp); // Read all from HEADER - incorrect values (why?)
+    fread(&fh.signature,2,1,bmp);
+    fread(&fh.file_size,4,1,bmp);
+    fread(&fh.reserved,4,1,bmp);
+    fread(&fh.file_offset_to_pixel_array,4,1,bmp);
+
     fread(&bih, 40, 1, bmp); // Read all from INFO_HEADER
 
     cout << "-------------------------------------" << endl;
     // INFO FROM FILE HEADER
     cout << "SIGNATURE: " << fh.signature << endl;
-    cout << "SIZE: " << fh.file_size << endl;
+    cout << "SIZE: " << fh.file_size << " B" << endl;
     cout << "RESERVED A: " << fh.reserved << endl;
-    cout << "OFFSET: " << fh.file_offset_to_pixel_array << endl;
+    cout << "OFFSET: " << fh.file_offset_to_pixel_array << " B"<< endl;
     cout << "-------------------------------------" << endl;
 
     //INFO FROM INFORMATION HEADER
-    cout << "BIH size: " << bih.dib_header_size << endl <<
-            "Image width: " << bih.image_width << endl <<
-            "Image height: " << bih.image_height << endl <<
+    cout << "BIH size: " << bih.dib_header_size << " B" << endl <<
+            "Image width: " << bih.image_width << " px" << endl <<
+            "Image height: " << bih.image_height << " px" << endl <<
             "Planes: " << bih.planes << endl <<
             "Depth: " << bih.bits_per_pixel << endl <<
             "Compression: " << bih.compression << endl <<
@@ -69,5 +75,12 @@ int main(void){
             "Colors: " << bih.colors_in_color_table << endl <<
             "Important colors: " << bih.important_color_count << endl;
 
+    cout << "-------------------------------------" << endl;
+    //cout << "> Converting image to negative..." << endl;
+    
+    // Conversion
+
+
+    //cout << "> Image converted!" << endl;
     cout << "-------------------------------------" << endl;
 }
