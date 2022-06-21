@@ -3,7 +3,7 @@
 using namespace std;
 
 struct FileHeader{ // 14 BYTES
-    char signature[2]; //2B 'BM'
+    uint8_t signature; //2B 'BM'
     uint32_t file_size; //4B file size in bytes
     uint32_t reserved; //4B unused=0
     uint32_t file_offset_to_pixel_array; //4B offset from beginning of file to the beggining of the bitmap data
@@ -45,8 +45,8 @@ int main(void){
     FileHeader fh;
     BitmapInformationHeader bih;
 
-    fread(&fh, 14, 1, bmp);
-    fread(&bih, 40, 1, bmp);
+    fread(&fh, 14, 1, bmp); // Read all from HEADER
+    fread(&bih, 40, 1, bmp); // Read all from INFO_HEADER
 
     cout << "-------------------------------------" << endl;
     // INFO FROM FILE HEADER
